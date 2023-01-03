@@ -10,7 +10,7 @@ import numpy as np
 # which operations are to be done.
 # Make sure that the image is in the same
 # directory in which this python program is
-img = cv2.imread('1.png')
+img = cv2.imread('2.png')
 
 # Convert the img to grayscale
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -79,7 +79,7 @@ for i in range(diag):
             # (0,0,255) denotes the colour of the line to be
             # drawn. In this case, it is red.
             cv2.line(img, (x1, y1), (x2, y2), (0, 0, 255), 1)
-cv2.imwrite('linesDetected.jpg', img)
+cv2.imwrite('linesDetected2.jpg', img)
 cv2.imshow("linesDetected", img)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
@@ -90,7 +90,7 @@ for i in range(diag):
         print(int(accumulator[i][j]), end=' ')
     print('')
 
-cv2.imwrite('houghSpace.jpg', accumulator)
+cv2.imwrite('houghSpace2.jpg', accumulator)
 cv2.imshow("HoughSpace", accumulator)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
