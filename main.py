@@ -94,4 +94,4 @@ def hough_transform(file_name, peak_vicinity=1, theta_precision=5, pixel_intensi
     return lines
 
 
-hough_transform("6.png", peak_vicinity=2)
+hough_transform("big1.png", peak_vicinity=15)

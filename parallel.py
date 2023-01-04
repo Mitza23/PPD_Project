@@ -6,13 +6,13 @@ import numpy as np
 
 
 def main():
-    master('big1.png', 4)
+    master('big1.png', 9)
 
 
 def master(file_name, worker_count):
     # Load the desired image
-    img = cv2.imread(file_name)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    original_img = cv2.imread(file_name)
+    gray = cv2.cvtColor(original_img, cv2.COLOR_BGR2GRAY)
     img = np.asarray(gray)
     # Split the image into chunks
     chunks = []
@@ -25,6 +25,8 @@ def master(file_name, worker_count):
     #     for j in i:
     #         print(j, end='')
     #     print('')
+
+    # Split the image in multiple chunks
     for i in range(chunk_count):
         for j in range(chunk_count):
             chunks.append(img[chunk_w * i : chunk_w * (i+1), chunk_h * j : chunk_h * (j+1)])
@@ -39,8 +41,8 @@ def master(file_name, worker_count):
 
         for future in futures:
             result = future.result()
-            plot(img, result)
-    cv2.imwrite('linesDetected_' + file_name, img)
+            plot(original_img, result)
+    cv2.imwrite('linesDetected_' + file_name, original_img)
 
 
 def work(image, index, count):
@@ -81,7 +83,7 @@ def plot(image, list):
         cv2.line(image, (x1, y1), (x2, y2), (0, 0, 255), 1)
 
 
-def hough_transform(image, worker_index, worker_count, peak_vicinity=15, theta_precision=5, pixel_intensity_threshold=200):
+def hough_transform(image, worker_index, worker_count, peak_vicinity=0, theta_precision=5, pixel_intensity_threshold=200):
     img_h, img_w = image.shape
     diag = int(math.sqrt(img_w ** 2 + img_h ** 2))
 
@@ -106,10 +108,19 @@ def hough_transform(image, worker_index, worker_count, peak_vicinity=15, theta_p
 
     lines = []
     # y = (r - x * cos(theta)) / sin(theta)
-    for i in range(diag):
-        for j in range(180):
-            if max - accumulator[i][j] <= peak_vicinity:
-                lines.append({"theta": j, "r": i + diag * (worker_index // math.sqrt(worker_count))})
+    batch_size = int(math.sqrt(worker_count))
+    line = worker_index // batch_size
+    column = worker_index % batch_size
+    offset = (line + column) * diag * 0.5
+    print(f'{worker_index}: {offset/diag}\n')
+    # cv2.imshow(str(worker_index), image)
+    # cv2.waitKey(0)
+    for r in range(diag):
+        for theta in range(180):
+            if max - accumulator[r][theta] <= peak_vicinity:
+            # if accumulator[r][theta] >= 20:
+                # lines.append({"theta": theta, "r": r + diag * (worker_index // int(math.sqrt(worker_count)))})
+                lines.append({"theta": theta, "r": r + offset})
     return lines
 
 
