@@ -12,7 +12,7 @@ def main():
 
     img = None
     if rank ==0:
-        file_name = '1.png'
+        file_name = 'small2.png'
         original_img = cv2.imread(file_name)
         gray = cv2.cvtColor(original_img, cv2.COLOR_BGR2GRAY)
         img = np.asarray(gray, dtype='i')
