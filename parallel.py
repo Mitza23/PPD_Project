@@ -1,9 +1,11 @@
 import math
 from concurrent.futures import ThreadPoolExecutor
-
+import time
 import cv2
 import numpy as np
 
+#  The synchronization used is just the one provided by the blocking nature of the future.result() function
+# on the main thread when it waits for the workers to finish detecting lines
 
 def main():
     master('big1.png', 16)
@@ -115,5 +117,7 @@ def hough_transform(image, worker_index, worker_count, limits,
     return lines
 
 
-if __name__ == '__main__':
-    main()
+start = time.time()
+main()
+end = time.time()
+print(end - start)

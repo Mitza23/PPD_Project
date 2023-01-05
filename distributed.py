@@ -2,39 +2,49 @@ from mpi4py import MPI
 import math
 import cv2
 import numpy as np
+import time
 
+#  The synchronization used is just the one provided by the blocking nature of the recv function
+# on the master process when it waits for the workers to finish detecting lines
 
 def main():
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
+    print(f'rank: {rank}')
 
-    print(rank)
+    file_name = 'big1.png'
+    original_img = cv2.imread(file_name)
+    # original_img = None
+    gray = cv2.cvtColor(original_img, cv2.COLOR_BGR2GRAY)
+    img = np.asarray(gray)
+    # img = np.asarray([[1, 1, 1], [0, 0, 0], [0, 0, 0]])
 
-    img = None
-    if rank ==0:
-        file_name = 'small2.png'
-        original_img = cv2.imread(file_name)
-        gray = cv2.cvtColor(original_img, cv2.COLOR_BGR2GRAY)
-        img = np.asarray(gray, dtype='i')
-    else:
-        img = np.empty(100, dtype='i')
-    comm.Bcast(img, root=0)
     if rank == 0:
+
         print("MASTER")
         master(file_name, original_img, img, comm, comm.Get_size() - 1)
+        end = time.time()
+        print(end - start)
     else:
-        print(rank)
+        print(f'SLAVE: {rank}')
         slave(img, comm, rank)
 
 
 def slave(image, comm, rank):
+    print("before recv")
     payload = comm.recv(source=0, tag=rank)
+    print(payload)
+    print("after recv")
+    print("before work")
     lines = work(image, payload['index'], payload['count'], payload['limits'])
-    print(rank)
+    print("after work")
+    print("before send")
     comm.send(lines, dest=0, tag=rank)
+    print("after send")
 
 
 def master(file_name, original_img, img, comm, worker_count):
+    print("MASTER")
     # Split the image into chunks
     chunks = []
     img_h, img_w = img.shape
@@ -52,9 +62,9 @@ def master(file_name, original_img, img, comm, worker_count):
         payload = {'limits': chunk, 'index': index, 'count': worker_count}
         comm.send(payload, dest=index + 1, tag=index + 1)
 
-        for i in range(1, worker_count):
-            result = comm.recv(source=i, tag=i)
-            plot(original_img, result)
+    for i in range(1, worker_count):
+        result = comm.recv(source=i, tag=i)
+        plot(original_img, result)
     cv2.imwrite('linesDetected_' + file_name, original_img)
 
 
@@ -135,4 +145,5 @@ def hough_transform(image, worker_index, worker_count, limits,
     return lines
 
 
+start = time.time()
 main()

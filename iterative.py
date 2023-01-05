@@ -1,10 +1,21 @@
 # Python program to illustrate HoughLine
 # method for line detection
 import math
-
+import time
 import cv2
 import numpy as np
 
+
+# The Hough transform is a technique for detecting lines, circles, or other shapes in an image.
+# It works by representing the shapes in the image as points in a multi-dimensional space,
+# and then using voting to identify the points that belong to the same shape.
+#
+# For example, to detect lines in an image, the Hough transform represents each point in the
+# image as a pair of polar coordinates (rho, theta) in a two-dimensional space, where rho is
+# the distance from the point to the origin and theta is the angle between the point and the
+# positive x-axis. The line through the point can then be represented as a sinusoidal curve in
+# this space. By identifying clusters of points that fall on the same curve, the
+# Hough transform can detect lines in the image.
 
 def hough_transform(file_name, peak_vicinity=1, theta_precision=5, pixel_intensity_threshold=200):
     # Load the desired image
@@ -94,4 +105,7 @@ def hough_transform(file_name, peak_vicinity=1, theta_precision=5, pixel_intensi
     return lines
 
 
+start = time.time()
 hough_transform("big1.png", peak_vicinity=15)
+end = time.time()
+print(end - start)

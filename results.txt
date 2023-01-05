@@ -1,0 +1,8 @@
+iterative: 0.1679990291595459s
+parallel: 0.07699131965637207s (4 threads)
+          0.14399957656860352s (9 threads)
+          0.21600055694580078s (16 threads)
+distributed: 0.050003767013549805s (4 workers)
+             0.12399697303771973s (9 workers)
+             0.2389998435974121s (16 workers)
+
